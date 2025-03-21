@@ -17,6 +17,7 @@ interface ViewerState {
 
 export function DigitalTwinViewer() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const canvasContainerRef = useRef<HTMLDivElement | null>(null);
   const [viewerState, setViewerState] = useState<ViewerState>({
     zoom: 1,
     rotation: 0,
@@ -24,24 +25,35 @@ export function DigitalTwinViewer() {
     showDetails: true
   });
   const [isLoading, setIsLoading] = useState(true);
+  const animationRef = useRef<number | null>(null);
 
   // Canvas animation for the simulated 3D model
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = canvasContainerRef.current;
+    
+    if (!canvas || !container) return;
     
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
-    let animationFrameId: number;
-    
+    // Set proper canvas dimensions based on the container
     const resizeCanvas = () => {
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
+      const rect = container.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      
+      // Force redraw after resize
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      draw();
     };
     
     // Simulated 3D model drawing
     const draw = () => {
+      if (!ctx || !canvas) return;
+      
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       const centerX = canvas.width / 2;
@@ -121,27 +133,35 @@ export function DigitalTwinViewer() {
       
       ctx.restore();
       
-      animationFrameId = requestAnimationFrame(draw);
+      // Continue animation
+      animationRef.current = requestAnimationFrame(draw);
     };
     
-    // Ensure canvas is properly sized before first draw
+    // Initial setup
+    window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
     
-    // Start animation and immediately set loading to false
-    draw();
-    setIsLoading(false);
+    // Start the animation
+    animationRef.current = requestAnimationFrame(draw);
     
-    // Show a toast notification when the model loads
-    toast({
-      title: "Digital Twin loaded",
-      description: "Interactive 3D model is now ready to explore",
-    });
+    // Set loading to false after a brief moment to ensure canvas is ready
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      
+      // Show a toast notification when the model loads
+      toast({
+        title: "Digital Twin loaded",
+        description: "Interactive 3D model is now ready to explore",
+      });
+    }, 500);
     
-    window.addEventListener('resize', resizeCanvas);
-    
+    // Cleanup
     return () => {
       window.removeEventListener('resize', resizeCanvas);
-      cancelAnimationFrame(animationFrameId);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      clearTimeout(timer);
     };
   }, [viewerState]);
 
@@ -171,6 +191,14 @@ export function DigitalTwinViewer() {
       ...prev,
       activeComponent: component
     }));
+    
+    // Provide feedback when a component is selected
+    if (component) {
+      toast({
+        title: `${component.charAt(0).toUpperCase() + component.slice(1)} selected`,
+        description: "View component details in the right panel",
+      });
+    }
   };
 
   return (
@@ -259,12 +287,15 @@ export function DigitalTwinViewer() {
           
           {/* 3D Viewer */}
           <div className="lg:col-span-2 order-1 lg:order-2">
-            <div className="relative h-[500px] rounded-2xl overflow-hidden border border-gray-light/60 bg-white shadow-card">
+            <div 
+              ref={canvasContainerRef}
+              className="relative h-[500px] rounded-2xl overflow-hidden border border-gray-light/60 bg-white shadow-card"
+            >
               {isLoading ? (
                 <div className="absolute inset-0 flex items-center justify-center bg-white">
                   <div className="flex flex-col items-center">
-                    <Skeleton className="w-12 h-12 rounded-full mb-3" />
-                    <Skeleton className="w-32 h-4 mb-2" />
+                    <div className="w-12 h-12 border-4 border-blue border-t-transparent rounded-full animate-spin mb-3"></div>
+                    <p className="text-sm text-gray-dark">Loading 3D model...</p>
                   </div>
                 </div>
               ) : (
