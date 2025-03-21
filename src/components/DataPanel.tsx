@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { ChartComponent, ChartData } from './ChartComponent';
 import { useInView } from '@/utils/animations';
@@ -181,7 +180,7 @@ export function DataPanel() {
                     </div>
                     {temperatureData.length > 0 && 
                       typeof temperatureData[temperatureData.length - 1]['Actual'] === 'number' && 
-                      temperatureData[temperatureData.length - 1]['Actual'] > 30 && (
+                      (temperatureData[temperatureData.length - 1]['Actual'] as number) > 30 && (
                       <div className="flex items-center text-warning text-sm">
                         <Bell className="h-4 w-4 mr-1" />
                         <span>Alert</span>
