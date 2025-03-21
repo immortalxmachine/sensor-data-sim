@@ -5,6 +5,8 @@ import GlassMorphism from './GlassMorphism';
 import { Maximize, Minimize, ZoomIn, ZoomOut, RotateCw, PanelLeft, PanelRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from '@/hooks/use-toast';
 
 interface ViewerState {
   zoom: number;
@@ -122,13 +124,20 @@ export function DigitalTwinViewer() {
       animationFrameId = requestAnimationFrame(draw);
     };
     
-    // Simulate loading
-    setTimeout(() => {
-      setIsLoading(false);
-      window.addEventListener('resize', resizeCanvas);
-      resizeCanvas();
-      draw();
-    }, 1500);
+    // Ensure canvas is properly sized before first draw
+    resizeCanvas();
+    
+    // Start animation and immediately set loading to false
+    draw();
+    setIsLoading(false);
+    
+    // Show a toast notification when the model loads
+    toast({
+      title: "Digital Twin loaded",
+      description: "Interactive 3D model is now ready to explore",
+    });
+    
+    window.addEventListener('resize', resizeCanvas);
     
     return () => {
       window.removeEventListener('resize', resizeCanvas);
@@ -254,8 +263,8 @@ export function DigitalTwinViewer() {
               {isLoading ? (
                 <div className="absolute inset-0 flex items-center justify-center bg-white">
                   <div className="flex flex-col items-center">
-                    <div className="w-12 h-12 border-4 border-blue rounded-full border-t-transparent animate-spin mb-3"></div>
-                    <span className="text-sm text-gray-dark">Loading 3D model...</span>
+                    <Skeleton className="w-12 h-12 rounded-full mb-3" />
+                    <Skeleton className="w-32 h-4 mb-2" />
                   </div>
                 </div>
               ) : (
