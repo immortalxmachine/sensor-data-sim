@@ -179,7 +179,9 @@ export function DataPanel() {
                       <h4 className="font-semibold">Temperature Monitoring</h4>
                       <p className="text-sm text-gray-dark">Last 24 hours</p>
                     </div>
-                    {temperatureData.length > 0 && temperatureData[temperatureData.length - 1]['Actual'] > 30 && (
+                    {temperatureData.length > 0 && 
+                      typeof temperatureData[temperatureData.length - 1]['Actual'] === 'number' && 
+                      temperatureData[temperatureData.length - 1]['Actual'] > 30 && (
                       <div className="flex items-center text-warning text-sm">
                         <Bell className="h-4 w-4 mr-1" />
                         <span>Alert</span>

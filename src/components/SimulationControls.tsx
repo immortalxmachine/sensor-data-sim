@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -38,17 +37,14 @@ export function SimulationControls() {
   
   const [ref, isInView] = useInView({ threshold: 0.1, triggerOnce: true });
   
-  // Simulation timer effect
   useEffect(() => {
     let intervalId: number;
     
     if (simulationState.running) {
       intervalId = window.setInterval(() => {
         setSimulationState(prev => {
-          // Calculate new flow rate based on speed and pressure
           const newFlowRate = (prev.speed / 100) * (prev.pressure * 0.8) * (prev.load / 50);
           
-          // Check if temperature is getting too high
           const showWarning = prev.temperature > 35 || prev.pressure > 2.0;
           
           return {
@@ -132,7 +128,6 @@ export function SimulationControls() {
         </div>
         
         <div className="grid md:grid-cols-5 gap-8">
-          {/* Simulation Controls */}
           <div className="md:col-span-2">
             <GlassMorphism className="p-6 md:p-8">
               <div className="flex items-center justify-between mb-6">
@@ -333,18 +328,14 @@ export function SimulationControls() {
             </GlassMorphism>
           </div>
           
-          {/* Simulation Visualization */}
           <div className="md:col-span-3">
             <GlassMorphism className="p-6 md:p-8 h-full">
               <h3 className="text-xl font-semibold mb-6">Simulation Visualization</h3>
               
               <div className="bg-white rounded-xl border border-gray-light/60 p-6 h-[400px] flex items-center justify-center relative overflow-hidden">
-                {/* Dynamic Simulation Visualization */}
                 <div className="w-full h-full relative">
-                  {/* System diagram */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-3/4 h-3/4 relative">
-                      {/* Motor */}
                       <div className="absolute top-1/2 left-0 transform -translate-y-1/2 w-32 h-24 rounded-lg bg-blue flex items-center justify-center border-2 border-white">
                         <div className="text-white text-sm font-medium">Motor</div>
                         <div className={cn(
@@ -353,7 +344,6 @@ export function SimulationControls() {
                         )} />
                       </div>
                       
-                      {/* Pump */}
                       <div className="absolute top-1/2 left-1/3 transform -translate-y-1/2 w-24 h-24 rounded-full bg-blue-dark flex items-center justify-center border-2 border-white">
                         <div className="text-white text-xs font-medium">Pump</div>
                         <div 
@@ -366,11 +356,9 @@ export function SimulationControls() {
                         ></div>
                       </div>
                       
-                      {/* Pipes */}
                       <div className="absolute top-1/4 left-1/2 right-0 h-4 bg-blue rounded-full"></div>
                       <div className="absolute bottom-1/4 left-1/2 right-0 h-4 bg-blue rounded-full"></div>
                       
-                      {/* Flow direction indicators */}
                       {simulationState.running && (
                         <>
                           <div className="absolute top-1/4 left-2/3 transform -translate-y-1/2 right-8">
@@ -424,7 +412,6 @@ export function SimulationControls() {
                         </>
                       )}
                       
-                      {/* Temperature indicator */}
                       <div className="absolute top-0 left-1/4 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
                         <div className="text-xs text-gray-dark mb-1">Temp</div>
                         <div 
@@ -441,7 +428,6 @@ export function SimulationControls() {
                         </div>
                       </div>
                       
-                      {/* Flow rate indicator */}
                       <div className="absolute bottom-0 right-1/4 transform translate-x-1/2 translate-y-1/2">
                         <div className="text-xs text-gray-dark mb-1">Flow Rate</div>
                         <div className="text-sm font-bold">
@@ -449,7 +435,6 @@ export function SimulationControls() {
                         </div>
                       </div>
                       
-                      {/* Heat effect visualization */}
                       {simulationState.temperature > 30 && (
                         <div 
                           className="absolute top-1/3 left-1/4 w-16 h-16 rounded-full bg-red-500 opacity-20 animate-pulse-subtle"
@@ -462,7 +447,6 @@ export function SimulationControls() {
                     </div>
                   </div>
                   
-                  {/* Status overlay */}
                   <div className="absolute top-4 right-4 bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 text-sm border border-gray-light/60">
                     <div className="flex items-center">
                       <div className={cn(
@@ -476,7 +460,8 @@ export function SimulationControls() {
                   </div>
                 </div>
                 
-                <style jsx>{`
+                <style>
+                  {`
                   @keyframes moveRight {
                     0% { transform: translateX(0); }
                     100% { transform: translateX(100%); }
@@ -486,7 +471,8 @@ export function SimulationControls() {
                     0% { transform: translateX(0); }
                     100% { transform: translateX(-100%); }
                   }
-                `}</style>
+                  `}
+                </style>
               </div>
               
               <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
